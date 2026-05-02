@@ -3,48 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Tailored News</title>
+    <title>Building Society Climate Briefing</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f4f4; }
-        .article { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; }
-        a { color: #007bff; text-decoration: none; font-weight: bold; }
-        .source { font-size: 0.8rem; color: #777; }
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .theme-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { color: #1a365d; text-align: center; }
+        h3 { color: #2c5282; margin-top: 0; }
+        p { color: #4a5568; }
+        .links { font-size: 0.85rem; border-top: 1px solid #edf2f7; pt: 10px; margin-top: 10px; }
+        a { color: #3182ce; text-decoration: none; margin-right: 15px; }
     </style>
 </head>
 <body>
-    <h1>My Daily News</h1>
-    <div id="news-container">Loading news...</div>
+    <h1>Climate Risk Briefing</h1>
+    <div id="container">Loading intelligence...</div>
 
     <script>
-        async function loadNews() {
+        async function loadBriefing() {
             try {
-                // Fetches the JSON file your bot created
                 const response = await fetch('./tailored_news.json');
                 const data = await response.json();
-                const container = document.getElementById('news-container');
-                container.innerHTML = ''; // Clear loading text
-
-                if (data.length === 0) {
-                    container.innerHTML = '<p>No news found today matching your keywords.</p>';
-                    return;
-                }
+                const container = document.getElementById('container');
+                container.innerHTML = '';
 
                 data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'article';
-                    div.innerHTML = `
-                        <div class="source">${item.source}</div>
-                        <a href="${item.link}" target="_blank">${item.title}</a>
-                        <div class="source">${item.date}</div>
+                    const card = document.createElement('div');
+                    card.className = 'theme-card';
+                    const linksHtml = item.links.map(l => `<a href="${l}" target="_blank">View Source</a>`).join('');
+                    card.innerHTML = `
+                        <h3>${item.theme}</h3>
+                        <p>${item.briefing}</p>
+                        <div class="links">${linksHtml}</div>
                     `;
-                    container.appendChild(div);
+                    container.appendChild(card);
                 });
             } catch (e) {
-                document.getElementById('news-container').innerHTML = 'Error loading news. Make sure tailored_news.json exists!';
+                document.getElementById('container').innerText = 'Briefing not found. Run the Action first!';
             }
         }
-        loadNews();
+        loadBriefing();
     </script>
 </body>
 </html>
