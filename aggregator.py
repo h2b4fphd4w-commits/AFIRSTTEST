@@ -28,7 +28,7 @@ def get_live_briefing():
     """
     
     # We call the model with 'google_search' enabled
-    response = model.generate_content(prompt, tools=[{'google_search': {}}])
+    response = model.generate_content(prompt, tools=[{'google_search_retrieval': {}}])
     
     try:
         # Extract and clean the JSON
