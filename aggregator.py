@@ -9,7 +9,11 @@ SOURCES = [
 ]
 
 # 2. TAILOR YOUR TOPICS: Only articles with these words will be saved
-KEYWORDS = ['AI', 'Space', 'Python', 'Green Energy']
+# Updated keywords for your specific niche
+KEYWORDS = [
+    'Climate', 'Sustainability', 'Net Zero', 'Green Finance', 
+    'Building Society', 'Mortgage', 'Mutuals', 'ESG', 'Retrofitting'
+]
 
 def fetch_and_filter():
     tailored_news = []
