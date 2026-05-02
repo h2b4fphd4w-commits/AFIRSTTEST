@@ -1,39 +1,44 @@
-import feedparser
 import json
-import datetime
+import os
+import google.generativeai as genai
 
-# 1. TAILOR YOUR SOURCES: Add any RSS feed URLs here
-SOURCES = [
-    'https://news.google.com/rss',
-    'https://techcrunch.com/feed/'
-]
+# Setup Gemini
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+# Note: Ensure you are using a model version that supports tools/search
+model = genai.GenerativeModel('gemini-2.0-flash') 
 
-# 2. TAILOR YOUR TOPICS: Only articles with these words will be saved
-# Updated keywords for your specific niche
-KEYWORDS = [
-    'Climate', 'Sustainability', 'Net Zero', 'Green Finance', 
-    'Building Society', 'Mortgage', 'Mutuals', 'ESG', 'Retrofitting'
-]
-
-def fetch_and_filter():
-    tailored_news = []
+def get_live_briefing():
+    prompt = """
+    Search for the most recent news (last 3 days) regarding climate change topics 
+    relevant to Nationwide Building Society. 
     
-    for url in SOURCES:
-        feed = feedparser.parse(url)
-        for entry in feed.entries:
-            # Check if any keyword is in the title or summary
-            content_to_check = (entry.title + entry.get('summary', '')).lower()
-            if any(key.lower() in content_to_check for key in KEYWORDS):
-                tailored_news.append({
-                    'title': entry.title,
-                    'link': entry.link,
-                    'date': entry.get('published', str(datetime.date.today())),
-                    'source': url.split('/')[2] # Extracts the domain name
-                })
-
-    # Save the results to a JSON file
-    with open('tailored_news.json', 'w') as f:
-        json.dump(tailored_news[:20], f, indent=4) # Keep the top 20 matches
+    These should be relevant to:
+    1. Climate risk management in banking and financial services
+    2. PRA SS5/25, or other UK applicable regulation
+    3. Climate scenario analysis and stress testing, including incorporating climate elements into IFRS9, and new Scenarios from the likes of NGFS
+    4. Climate related disclosures (ISSB S2, TCFD, Transition Plans)
+    5. Financed emissions and target setting
+    6. Data, modelling and risk management challenges
+    7. Associated peer bank activity (Lloyds, Natwest, Barclays, Santander, HSBC)
+    
+    COLLATE this into a thematic briefing. 
+    Format the final output as a JSON list of objects:
+    [{"theme": "...", "briefing": "...", "links": ["url1", "url2"]}]
+    """
+    
+    # We call the model with 'google_search' enabled
+    response = model.generate_content(prompt, tools=[{'google_search': {}}])
+    
+    try:
+        # Extract and clean the JSON
+        clean_json = response.text.replace('```json', '').replace('```', '').strip()
+        return json.loads(clean_json)
+    except:
+        # Fallback if AI formatting gets messy
+        print("Formatting error, retrying...")
+        return []
 
 if __name__ == "__main__":
-    fetch_and_filter()
+    briefing = get_live_briefing()
+    with open('tailored_news.json', 'w') as f:
+        json.dump(briefing, f, indent=4)
