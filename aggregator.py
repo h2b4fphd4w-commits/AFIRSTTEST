@@ -1,11 +1,9 @@
 import json
 import os
-import google.generativeai as genai
+from google import genai
 
-# Setup Gemini
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-# Note: Ensure you are using a model version that supports tools/search
-model = genai.GenerativeModel('gemini-2.0-flash') 
+# Use the new Client setup
+client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
 def get_live_briefing():
     prompt = """
@@ -30,13 +28,23 @@ def get_live_briefing():
     # We call the model with 'google_search' enabled
     response = model.generate_content(prompt, tools=[{'google_search_retrieval': {}}])
     
-    try:
-        # Extract and clean the JSON
-        clean_json = response.text.replace('```json', '').replace('```', '').strip()
+        try:
+        # The new library uses 'google_search' as a simple tool
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt,
+            config={
+                'tools': [{'google_search': {}}]
+            }
+        )
+        
+        # Extract text content
+        text_content = response.text
+        clean_json = text_content.replace('
+```json', '').replace('```', '').strip()
         return json.loads(clean_json)
-    except:
-        # Fallback if AI formatting gets messy
-        print("Formatting error, retrying...")
+    except Exception as e:
+        print(f"Error: {e}")
         return []
 
 if __name__ == "__main__":
