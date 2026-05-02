@@ -1,33 +1,31 @@
-name: Custom News Refresh
+name: AI News Search
 on:
   schedule:
-    - cron: '0 9 * * *' # This runs every day at 9:00 AM UTC
-  workflow_dispatch:      # This adds a "Run" button so you can test it NOW
+    - cron: '0 9 * * *' # Runs every day at 9:00 AM UTC
+  workflow_dispatch:      # Allows manual trigger
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write    # Allows the bot to save the news file back to your repo
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
       - name: Install dependencies
         run: pip install -r requirements.txt
-
       - name: Run aggregator
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: python aggregator.py
-
-      - name: Save news to repo
+      - name: Save to repo
         run: |
-          git config --global user.name "NewsBot"
+          git config --global user.name "AI-News-Bot"
           git config --global user.email "actions@github.com"
           git add tailored_news.json
-          git commit -m "Automated news update: $(date)" || exit 0
+          git commit -m "Updated AI Briefing: $(date)" || exit 0
           git push
