@@ -2,7 +2,7 @@ import json
 import os
 from google import genai
 
-# Use the new Client setup
+# Setup the Client
 client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
 def get_live_briefing():
@@ -20,31 +20,24 @@ def get_live_briefing():
     7. Changes in government green policy, energy security strategy, or home energy efficiency
     8. Associated peer bank activity (Lloyds, Natwest, Barclays, Santander, HSBC)
     
-    COLLATE this into a thematic briefing. Ignore marketing materials. 
-    Format the final output as a JSON list of objects:
-    [{"theme": "...", "briefing": "...", "links": ["url1", "url2"]}]
+    COLLATE this into a thematic briefing. Ignore marketing materials.
+    Return ONLY a JSON list of objects:
+    [{"theme": "...", "briefing": "...", "links": ["..."]}]
     """
     
-    # We call the model with 'google_search' enabled
-    response = model.generate_content(prompt, tools=[{'google_search_retrieval': {}}])
-    
-        try:
-        # The new library uses 'google_search' as a simple tool
+    try:
         response = client.models.generate_content(
             model='gemini-2.0-flash',
             contents=prompt,
-            config={
-                'tools': [{'google_search': {}}]
-            }
+            config={'tools': [{'google_search': {}}]}
         )
         
-        # Extract text content
+        # Clean the output to ensure it is valid JSON
         text_content = response.text
-        clean_json = text_content.replace('
-```json', '').replace('```', '').strip()
+        clean_json = text_content.replace('```json', '').replace('```', '').strip()
         return json.loads(clean_json)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error occurred: {e}")
         return []
 
 if __name__ == "__main__":
