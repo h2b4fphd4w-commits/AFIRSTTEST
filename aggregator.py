@@ -19,9 +19,10 @@ def get_live_briefing():
     4. Climate related disclosures (ISSB S2, TCFD, Transition Plans)
     5. Financed emissions and target setting
     6. Data, modelling and risk management challenges
-    7. Associated peer bank activity (Lloyds, Natwest, Barclays, Santander, HSBC)
+    7. Changes in government green policy, energy security strategy, or home energy efficiency
+    8. Associated peer bank activity (Lloyds, Natwest, Barclays, Santander, HSBC)
     
-    COLLATE this into a thematic briefing. 
+    COLLATE this into a thematic briefing. Ignore marketing materials. 
     Format the final output as a JSON list of objects:
     [{"theme": "...", "briefing": "...", "links": ["url1", "url2"]}]
     """
