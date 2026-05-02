@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tailored News</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f4f4; }
+        .article { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .source { font-size: 0.8rem; color: #777; }
+    </style>
+</head>
+<body>
+    <h1>My Daily News</h1>
+    <div id="news-container">Loading news...</div>
+
+    <script>
+        async function loadNews() {
+            try {
+                // Fetches the JSON file your bot created
+                const response = await fetch('./tailored_news.json');
+                const data = await response.json();
+                const container = document.getElementById('news-container');
+                container.innerHTML = ''; // Clear loading text
+
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No news found today matching your keywords.</p>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'article';
+                    div.innerHTML = `
+                        <div class="source">${item.source}</div>
+                        <a href="${item.link}" target="_blank">${item.title}</a>
+                        <div class="source">${item.date}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (e) {
+                document.getElementById('news-container').innerHTML = 'Error loading news. Make sure tailored_news.json exists!';
+            }
+        }
+        loadNews();
+    </script>
+</body>
+</html>
